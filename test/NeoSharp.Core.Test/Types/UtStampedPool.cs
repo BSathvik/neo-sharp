@@ -9,6 +9,20 @@ namespace NeoSharp.Core.Test.Types
     [TestClass]
     public class UtStampedPool : TestBase
     {
+
+        [TestMethod]
+        public void Test_StampedPool_StampToString()
+        {
+            var pool = new StampedPool<UInt256, UInt256>(PoolMaxBehaviour.RemoveFromEnd, 3, x => x.Value, (x, y) => x.Date.CompareTo(y.Date));
+
+            var add = new UInt256("3A259DBA256600620C6C91094F3A300B30F0CBAECEE19C6114DEFFD3288957D7".HexToBytes());
+
+            Assert.IsTrue(pool.Push(add));
+            Assert.AreEqual(1, pool.Count);
+
+            Assert.AreEqual(add.ToString(), pool.Peek()[0].Value.ToString());
+        }
+
         [TestMethod]
         public void Test_StampedPool_SamePush()
         {
