@@ -21,7 +21,6 @@ namespace NeoSharp.Core.Test.Types
             };
 
             Assert.IsTrue(pool.Push(add[0]));
-            System.Threading.Thread.Sleep(1200);
             Assert.IsFalse(pool.Push(add[1]));
 
             Assert.AreEqual(1, pool.Count);
