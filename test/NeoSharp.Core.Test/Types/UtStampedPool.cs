@@ -20,7 +20,7 @@ namespace NeoSharp.Core.Test.Types
             Assert.IsTrue(pool.Push(add));
             Assert.AreEqual(1, pool.Count);
 
-            Assert.AreEqual(add.ToString(), pool.Peek()[0].Value.ToString());
+            Assert.AreEqual(add.ToString(), pool.Peek()[0].ToString());
         }
 
         [TestMethod]
