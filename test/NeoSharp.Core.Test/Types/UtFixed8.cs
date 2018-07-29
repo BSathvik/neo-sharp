@@ -382,7 +382,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8();
             var operatorTwo = new Fixed8();
 
-            operatorOne.Should().Be(operatorTwo);
+            (operatorOne == operatorTwo).Should().BeTrue();
         }
 
         [TestMethod]
@@ -391,7 +391,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8();
             var operatorTwo = new Fixed8(1);
 
-            operatorOne.Should().NotBe(operatorTwo);
+            (operatorOne == operatorTwo).Should().BeFalse();
         }
 
         [TestMethod]
@@ -400,7 +400,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8(10);
             var operatorTwo = new Fixed8(5);
 
-            operatorOne.Should().BeGreaterOrEqualTo(operatorTwo);
+            (operatorOne >= operatorTwo).Should().BeTrue();
         }
 
         [TestMethod]
@@ -409,7 +409,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8(10);
             var operatorTwo = new Fixed8(10);
 
-            operatorOne.Should().BeGreaterOrEqualTo(operatorTwo);
+            (operatorOne >= operatorTwo).Should().BeTrue();
         }
 
         [TestMethod]
@@ -418,7 +418,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8(5);
             var operatorTwo = new Fixed8(10);
 
-            operatorOne.Should().BeLessOrEqualTo(operatorTwo);
+            (operatorOne >= operatorTwo).Should().BeFalse();
         }
 
         [TestMethod]
@@ -427,7 +427,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8(5);
             var operatorTwo = new Fixed8(10);
 
-            operatorOne.Should().BeLessOrEqualTo(operatorTwo);
+            (operatorOne <= operatorTwo).Should().BeTrue();
         }
 
         [TestMethod]
@@ -436,7 +436,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8(10);
             var operatorTwo = new Fixed8(10);
 
-            operatorOne.Should().BeLessOrEqualTo(operatorTwo);
+            (operatorOne <= operatorTwo).Should().BeTrue();
         }
 
         [TestMethod]
@@ -445,7 +445,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8(10);
             var operatorTwo = new Fixed8(5);
 
-            operatorOne.Should().BeGreaterThan(operatorTwo);
+            (operatorOne <= operatorTwo).Should().BeFalse();
         }
 
         [TestMethod]
@@ -454,7 +454,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8(10);
             var operatorTwo = new Fixed8(5);
 
-            operatorOne.Should().NotBe(operatorTwo);
+            (operatorOne != operatorTwo).Should().BeTrue();
         }
 
         [TestMethod]
@@ -463,7 +463,7 @@ namespace NeoSharp.Core.Test.Types
             var operatorOne = new Fixed8(10);
             var operatorTwo = new Fixed8(10);
 
-            operatorOne.Should().Be(operatorTwo);
+            (operatorOne != operatorTwo).Should().BeFalse();
         }
 
         [TestMethod]
