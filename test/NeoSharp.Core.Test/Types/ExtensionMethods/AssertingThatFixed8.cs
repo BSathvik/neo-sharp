@@ -33,13 +33,13 @@ namespace NeoSharp.Core.Test.Types.ExtensionMethods
 
         public static AssertingThat<Fixed8> IsGreaterThan(this AssertingThat<Fixed8> that, Fixed8 secondValue)
         {
-            that.Assertable.Should().BeGreaterThan(secondValue);
+            (that.Assertable > secondValue).Should().BeTrue();
             return that;
         }
 
         public static AssertingThat<Fixed8> IsSmallerThan(this AssertingThat<Fixed8> that, Fixed8 secondValue)
         {
-            that.Assertable.Should().BeLessThan(secondValue);
+            (that.Assertable < secondValue).Should().BeTrue();
             return that;
         }
     }
