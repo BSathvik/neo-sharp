@@ -47,8 +47,8 @@ namespace NeoSharp.Persistence.RedisDB
 
         public async Task<uint> GetTotalBlockHeight()
         {
-            var raw = await _redisDbContext.Get(_sysCurrentBlockKey);
-            return raw == RedisValue.Null ? uint.MinValue : (uint) raw;
+            var val = await _redisDbContext.Get(_sysCurrentBlockKey);
+            return val == RedisValue.Null ? uint.MinValue : (uint) val;
         }
 
         public async Task SetTotalBlockHeight(uint height)
@@ -58,8 +58,8 @@ namespace NeoSharp.Persistence.RedisDB
 
         public async Task<uint> GetTotalBlockHeaderHeight()
         {
-            var raw = await _redisDbContext.Get(_sysCurrentBlockHeaderKey);
-            return raw == RedisValue.Null ? uint.MinValue : (uint) raw;
+            var val = await _redisDbContext.Get(_sysCurrentBlockHeaderKey);
+            return val == RedisValue.Null ? uint.MinValue : (uint) val;
         }
 
         public async Task SetTotalBlockHeaderHeight(uint height)
@@ -69,8 +69,8 @@ namespace NeoSharp.Persistence.RedisDB
 
         public async Task<string> GetVersion()
         {
-            var raw = await _redisDbContext.Get(_sysVersionKey);
-            return raw == RedisValue.Null ? null : (string) raw;
+            var val = await _redisDbContext.Get(_sysVersionKey);
+            return val == RedisValue.Null ? null : (string) val;
         }
 
         public async Task SetVersion(string version)
@@ -99,7 +99,8 @@ namespace NeoSharp.Persistence.RedisDB
 
         public async Task<UInt256> GetBlockHashFromHeight(uint height)
         {
-            return await _redisDbContext.GetFromHashIndex(RedisIndex.BlockHeight, height);
+            var hash = await _redisDbContext.GetFromHashIndex(RedisIndex.BlockHeight, height);
+            return hash ?? UInt256.Zero;
         }
 
         public async Task<BlockHeader> GetBlockHeader(UInt256 hash)
@@ -230,8 +231,8 @@ namespace NeoSharp.Persistence.RedisDB
 
         public async Task<uint> GetIndexHeight()
         {
-            var raw = await _redisDbContext.Get(_indexHeightKey);
-            return raw == RedisValue.Null ? uint.MinValue : (uint) raw;
+            var val = await _redisDbContext.Get(_indexHeightKey);
+            return val == RedisValue.Null ? uint.MinValue : (uint) val;
         }
 
         public async Task SetIndexHeight(uint height)
@@ -241,28 +242,28 @@ namespace NeoSharp.Persistence.RedisDB
 
         public async Task<HashSet<CoinReference>> GetIndexConfirmed(UInt160 scriptHash)
         {
-            var redisVal = await _redisDbContext.Get(scriptHash.BuildIxConfirmedKey());
-            if (redisVal == RedisValue.Null) return new HashSet<CoinReference>();
-            return _binaryDeserializer.Deserialize<HashSet<CoinReference>>(redisVal);
+            var raw = await _redisDbContext.Get(scriptHash.BuildIxConfirmedKey());
+            if (raw == RedisValue.Null) return new HashSet<CoinReference>();
+            return _binaryDeserializer.Deserialize<HashSet<CoinReference>>(raw);
         }
 
         public async Task SetIndexConfirmed(UInt160 scriptHash, HashSet<CoinReference> coinReferences)
         {
-            var val = _binarySerializer.Serialize(coinReferences.ToArray());
-            await _redisDbContext.Set(scriptHash.BuildIxConfirmedKey(), val);
+            var raw = _binarySerializer.Serialize(coinReferences.ToArray());
+            await _redisDbContext.Set(scriptHash.BuildIxConfirmedKey(), raw);
         }
 
         public async Task<HashSet<CoinReference>> GetIndexClaimable(UInt160 scriptHash)
         {
-            var redisVal = await _redisDbContext.Get(scriptHash.BuildIxClaimableKey());
-            if (redisVal == RedisValue.Null) return new HashSet<CoinReference>();
-            return _binaryDeserializer.Deserialize<HashSet<CoinReference>>(redisVal);
+            var raw = await _redisDbContext.Get(scriptHash.BuildIxClaimableKey());
+            if (raw == RedisValue.Null) return new HashSet<CoinReference>();
+            return _binaryDeserializer.Deserialize<HashSet<CoinReference>>(raw);
         }
 
         public async Task SetIndexClaimable(UInt160 scriptHash, HashSet<CoinReference> coinReferences)
         {
-            var val = _binarySerializer.Serialize(coinReferences.ToArray());
-            await _redisDbContext.Set(scriptHash.BuildIxClaimableKey(), val);
+            var raw = _binarySerializer.Serialize(coinReferences.ToArray());
+            await _redisDbContext.Set(scriptHash.BuildIxClaimableKey(), raw);
         }
 
         #endregion
