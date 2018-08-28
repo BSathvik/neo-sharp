@@ -19,14 +19,6 @@ namespace NeoSharp.Persistence.Redis.Tests
     [TestClass]
     public class UtRedisDbJsonRepository : TestBase
     {
-        private Mock<IJsonConverter> _jsonConverterMock;
-
-        [TestInitialize]
-        public void TestInit()
-        {
-            _jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
-        }
-
         [TestMethod]
         public void Ctor_CreateValidRedisDbRepository()
         {
@@ -236,8 +228,9 @@ namespace NeoSharp.Persistence.Redis.Tests
             blockHeaderParameter.Timestamp = timestamp;
 
             var expectedblockJson = $"{{\"Hash\":{hash},\"Index\":{index}}}";
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
 
-            _jsonConverterMock
+            jsonConverterMock
                 .Setup(x => x.SerializeObject(blockHeaderParameter))
                 .Returns(expectedblockJson);
 
@@ -289,13 +282,14 @@ namespace NeoSharp.Persistence.Redis.Tests
         public async Task GetAccount_ValueFound_ReturnsAccount()
         {
             var input = UInt160.Parse(RandomInt().ToString("X40"));
-            var expectedJson = "{{}}";
+            var expectedJson = "{}";
             var expectedResult = new Account();
             var redisDbContextMock = AutoMockContainer.GetMock<IRedisDbContext>();
             redisDbContextMock
                 .Setup(m => m.Get(It.Is<RedisKey>(b => b == input.BuildStateAccountKey())))
                 .ReturnsAsync(expectedJson);
-            _jsonConverterMock.Setup(m => m.DeserializeObject<Account>(expectedJson)).Returns(expectedResult);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.DeserializeObject<Account>(expectedJson)).Returns(expectedResult);
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
 
             var result = await testee.GetAccount(input);
@@ -311,7 +305,8 @@ namespace NeoSharp.Persistence.Redis.Tests
                 ScriptHash = UInt160.Parse(RandomInt().ToString("X40"))
             };
             var expectedJson = "{}";
-            _jsonConverterMock.Setup(m => m.SerializeObject(input)).Returns(expectedJson);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.SerializeObject(input)).Returns(expectedJson);
             var redisDbContextMock = AutoMockContainer.GetMock<IRedisDbContext>();
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
             await testee.AddAccount(input);
@@ -357,7 +352,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             redisDbContextMock
                 .Setup(m => m.Get(It.Is<RedisKey>(b => b == input.BuildStateCoinKey())))
                 .ReturnsAsync(expectedJson);
-            _jsonConverterMock.Setup(m => m.DeserializeObject<CoinState[]>(expectedJson)).Returns(expectedResult);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.DeserializeObject<CoinState[]>(expectedJson)).Returns(expectedResult);
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
 
             var result = await testee.GetCoinStates(input);
@@ -371,7 +367,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             var inputHash = UInt256.Parse(RandomInt().ToString("X64"));
             var inputStates = new[] { new CoinState() };
             var expectedJson = "{}";
-            _jsonConverterMock.Setup(m => m.SerializeObject(inputStates)).Returns(expectedJson);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.SerializeObject(inputStates)).Returns(expectedJson);
             var redisDbContextMock = AutoMockContainer.GetMock<IRedisDbContext>();
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
             await testee.AddCoinStates(inputHash, inputStates);
@@ -421,7 +418,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             redisDbContextMock
                 .Setup(m => m.Get(It.Is<RedisKey>(b => b == input.BuildStateValidatorKey())))
                 .ReturnsAsync(expectedJson);
-            _jsonConverterMock.Setup(m => m.DeserializeObject<Validator>(expectedJson)).Returns(expectedResult);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.DeserializeObject<Validator>(expectedJson)).Returns(expectedResult);
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
 
             var result = await testee.GetValidator(input);
@@ -437,7 +435,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             var point = new ECPoint(pubkey);
             var input = new Validator { PublicKey = point };
             var expectedJson = "{}";
-            _jsonConverterMock.Setup(m => m.SerializeObject(input)).Returns(expectedJson);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.SerializeObject(input)).Returns(expectedJson);
             var redisDbContextMock = AutoMockContainer.GetMock<IRedisDbContext>();
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
             await testee.AddValidator(input);
@@ -486,7 +485,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             redisDbContextMock
                 .Setup(m => m.Get(It.Is<RedisKey>(b => b == input.BuildStateAssetKey())))
                 .ReturnsAsync(expectedJson);
-            _jsonConverterMock.Setup(m => m.DeserializeObject<Asset>(expectedJson)).Returns(expectedResult);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.DeserializeObject<Asset>(expectedJson)).Returns(expectedResult);
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
 
             var result = await testee.GetAsset(input);
@@ -500,7 +500,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             var inputHash = UInt256.Parse(RandomInt().ToString("X64"));
             var input = new Asset { Id = inputHash };
             var expectedJson = "{}";
-            _jsonConverterMock.Setup(m => m.SerializeObject(input)).Returns(expectedJson);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.SerializeObject(input)).Returns(expectedJson);
             var redisDbContextMock = AutoMockContainer.GetMock<IRedisDbContext>();
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
             await testee.AddAsset(input);
@@ -547,7 +548,10 @@ namespace NeoSharp.Persistence.Redis.Tests
             redisDbContextMock
                 .Setup(m => m.Get(It.Is<RedisKey>(b => b == input.BuildStateContractKey())))
                 .ReturnsAsync(expectedJson);
-            _jsonConverterMock.Setup(m => m.DeserializeObject<Contract>(expectedJson)).Returns(expectedResult);
+
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.DeserializeObject<Contract>(expectedJson)).Returns(expectedResult);
+
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
 
             var result = await testee.GetContract(input);
@@ -561,7 +565,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             var inputHash = UInt160.Parse(RandomInt().ToString("X40"));
             var input = new Contract { Code = new Code { ScriptHash = inputHash } };
             var expectedJson = "{}";
-            _jsonConverterMock.Setup(m => m.SerializeObject(input)).Returns(expectedJson);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.SerializeObject(input)).Returns(expectedJson);
             var redisDbContextMock = AutoMockContainer.GetMock<IRedisDbContext>();
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
             await testee.AddContract(input);
@@ -616,7 +621,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             redisDbContextMock
                 .Setup(m => m.Get(It.Is<RedisKey>(b => b == input.BuildStateStorageKey())))
                 .ReturnsAsync(expectedJson);
-            _jsonConverterMock.Setup(m => m.DeserializeObject<StorageValue>(expectedJson)).Returns(expectedResult);
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock.Setup(m => m.DeserializeObject<StorageValue>(expectedJson)).Returns(expectedResult);
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
 
             var result = await testee.GetStorage(input);
@@ -724,7 +730,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             redisDbContextMock
                 .Setup(m => m.Get(It.Is<RedisKey>(b => b == input.BuildIxConfirmedKey())))
                 .ReturnsAsync(expectedJson);
-            _jsonConverterMock
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock
                 .Setup(m => m.DeserializeObject<HashSet<CoinReference>>(expectedJson))
                 .Returns(expectedReferences);
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
@@ -755,7 +762,8 @@ namespace NeoSharp.Persistence.Redis.Tests
                 }
             }.ToHashSet();
             var expectedJson = "{}";
-            _jsonConverterMock
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock
                 .Setup(m => m.SerializeObject(It.Is<HashSet<CoinReference>>(arr => arr.SequenceEqual(inputReferences))))
                 .Returns(expectedJson);
             var redisDbContextMock = AutoMockContainer.GetMock<IRedisDbContext>();
@@ -803,7 +811,8 @@ namespace NeoSharp.Persistence.Redis.Tests
             redisDbContextMock
                 .Setup(m => m.Get(It.Is<RedisKey>(b => b == input.BuildIxClaimableKey())))
                 .ReturnsAsync(expectedJson);
-            _jsonConverterMock
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock
                 .Setup(m => m.DeserializeObject<HashSet<CoinReference>>(expectedJson))
                 .Returns(expectedReferences);
             var testee = AutoMockContainer.Create<RedisDbJsonRepository>();
@@ -834,7 +843,8 @@ namespace NeoSharp.Persistence.Redis.Tests
                 }
             }.ToHashSet();
             var expectedJson = "{}";
-            _jsonConverterMock
+            var jsonConverterMock = AutoMockContainer.GetMock<IJsonConverter>();
+            jsonConverterMock
                 .Setup(m => m.SerializeObject(It.Is<CoinReference[]>(arr => arr.SequenceEqual(inputReferences))))
                 .Returns(expectedJson);
             var redisDbContextMock = AutoMockContainer.GetMock<IRedisDbContext>();
